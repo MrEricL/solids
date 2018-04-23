@@ -12,7 +12,25 @@ def scanline_convert(polygons, i, screen, zbuffer ):
     ybot
     mid
     '''
-    draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, color ) 
+
+    #draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, color ) 
+
+    points = [polygons[0],polygons[1],polygons[2]]
+    points.sort(key=lambda x: x[1])
+
+    top = points[-1]
+    mid = points[0]
+    bot = points[1]
+
+    x0 = bot[0]
+    x1 = top[0]
+
+    y = "???"
+
+    try:
+
+
+    except:
 
 def add_polygon( polygons, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
     add_point(polygons, x0, y0, z0)
