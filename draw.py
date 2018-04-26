@@ -2,35 +2,67 @@ from display import *
 from matrix import *
 from math import *
 from gmath import *
+import random
+
+
 
 def scanline_convert(polygons, i, screen, zbuffer ):
-    '''
-    polygon[i],polygon[i+1],polygon[i+2]
-    x0
-    x1
-    ytop
-    ybot
-    mid
-    '''
 
-    #draw_line( x0, y0, z0, x1, y1, z1, screen, zbuffer, color ) 
+    color = [random.randint(0, 255),random.randint(0, 255),random.randint(0, 255)]
 
-    points = [polygons[0],polygons[1],polygons[2]]
+    # Edge table
+    points = [polygons[i],polygons[i+1],polygons[i+2]]
+
+    #print points
+
     points.sort(key=lambda x: x[1])
+    
+    top = points[2] #  Top coordinates
+    mid = points[1]  #  Leftover coor
+    bot = points[0]  #  Bottom coor
 
-    top = points[-1]
-    mid = points[0]
-    bot = points[1]
+    print top, mid, bot
+    print "\n"
 
-    x0 = bot[0]
-    x1 = top[0]
+    ymax = top[1]
+    ymin = bot[1]
+    ymid = mid[1]
 
-    y = "???"
+    xmin = bot[0]
+    xmax = top[0]
+    xmid = mid[0]
 
-    try:
+
+    xscan0 = xmin
+    xscan1 = xmin
+    yscan = ymin # the scanline
+
+    xswitch = False #switching the addition
 
 
-    except:
+
+    while (yscan < ymax):
+        #print ymax,ymin,ymid,xmax,xmin,xmid
+        draw_line( xscan0, yscan, 0, xscan1, yscan, 0, screen, zbuffer, color )
+
+        
+        xscan0 += ((xmax-xmin)/(ymax-ymin))
+
+        if yscan == ymid:
+            xswitch = True
+            #xscan1 = xmid
+
+        if xswitch:
+            xscan1 += ((xmax-xmin)/(ymax-ymid))
+        else:
+            xscan1 += ((xmid-xmin)/(ymid-ymin))
+
+        yscan += 1
+        #print "yscan",yscan
+
+
+
+
 
 def add_polygon( polygons, x0, y0, z0, x1, y1, z1, x2, y2, z2 ):
     add_point(polygons, x0, y0, z0)
@@ -46,8 +78,9 @@ def draw_polygons( matrix, screen, zbuffer, color ):
     while point < len(matrix) - 2:
 
         normal = calculate_normal(matrix, point)[:]
-
+        
         if normal[2] > 0:
+            
             draw_line( int(matrix[point][0]),
                        int(matrix[point][1]),
                        matrix[point][2],
