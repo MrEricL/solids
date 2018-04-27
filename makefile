@@ -1,7 +1,7 @@
 
 run: main.py display.py draw.py matrix.py parser.py gmath.py
 	python main.py
-	open robot.png
+	open hand.png
 
 clean:
 	rm *.pyc

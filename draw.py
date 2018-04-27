@@ -10,55 +10,99 @@ def scanline_convert(polygons, i, screen, zbuffer ):
 
     color = [random.randint(0, 255),random.randint(0, 255),random.randint(0, 255)]
 
-    # Edge table
-    points = [polygons[i],polygons[i+1],polygons[i+2]]
+    x0 = polygons[i][0]
+    x1 = polygons[i+1][0]
+    x2 = polygons[i+2][0]
 
-    #print points
+    y0 = polygons[i][1]
+    y1 = polygons[i+1][1]
+    y2 = polygons[i+2][1]
 
-    points.sort(key=lambda x: x[1])
+    z0 = polygons[i][2]
+    z1 = polygons[i+1][2]
+    z2 = polygons[i+2][2]
     
-    top = points[2] #  Top coordinates
-    mid = points[1]  #  Leftover coor
-    bot = points[0]  #  Bottom coor
 
-    print top, mid, bot
-    print "\n"
+    if (y0 > y2):
+        tempx = x0
+        tempy = y0
+        tempz = z0
 
-    ymax = top[1]
-    ymin = bot[1]
-    ymid = mid[1]
+        x0=x2
+        x2=tempx
 
-    xmin = bot[0]
-    xmax = top[0]
-    xmid = mid[0]
+        y0=y2
+        y2=tempy
 
-
-    xscan0 = xmin
-    xscan1 = xmin
-    yscan = ymin # the scanline
-
-    xswitch = False #switching the addition
+        z0=z2
+        z2=tempz
 
 
+    if (y0 > y1): 
+        tempx = x0
+        tempy = y0
+        tempz = z0
 
-    while (yscan < ymax):
-        #print ymax,ymin,ymid,xmax,xmin,xmid
-        draw_line( xscan0, yscan, 0, xscan1, yscan, 0, screen, zbuffer, color )
+        x0=x1
+        x1=tempx
 
-        
-        xscan0 += ((xmax-xmin)/(ymax-ymin))
+        y0=y1
+        y1=tempy
 
-        if yscan == ymid:
-            xswitch = True
-            #xscan1 = xmid
+        z0=z1
+        z1=tempz
+    
+    if (y1 > y2): 
+        tempx = x1
+        tempy = y1
+        tempz = z1
 
-        if xswitch:
-            xscan1 += ((xmax-xmin)/(ymax-ymid))
-        else:
-            xscan1 += ((xmid-xmin)/(ymid-ymin))
+        x1=x2
+        x2=tempx
 
-        yscan += 1
-        #print "yscan",yscan
+        y1=y2
+        y2=tempy
+
+        z1=z2
+        z2=tempz
+
+
+    y = y0 
+    xstart = x0 
+    xend = x0 
+    zstart = z0 
+    zend = z1 
+    deltax = (x2-x0)/(y2-y0)
+    deltaz = (z2-z0)/(y2-y0)
+    draw_line(xstart, y, zstart, xend, y, zend, screen, zbuffer, color)
+
+    if y1 - y0 != 0: 
+        deltaxend = (x1-x0)/(y1-y0)
+        deltazend = (z1-z0)/(y1-y0)
+
+        while y < y1: 
+            draw_line(xstart, y, zstart, xend, y, zend, screen, zbuffer, color)
+            xstart += deltax
+            xend += deltaxend
+            zstart += deltaz
+            zend += deltazend
+            y += 1
+
+    y = y1 
+    xend = x1 
+    zend = z1 
+    draw_line(xstart, y, zstart, xend, y, zend, screen, zbuffer, color)
+
+    if y2 - y1 != 0:
+        deltaxend = (x2-x1)/(y2-y1)
+        deltazend = (z2-z1)/(y2-y1)
+        while y < y2: 
+            draw_line(xstart, y, zstart, xend, y, zend, screen, zbuffer, color)
+            xstart += deltax
+            xend += deltaxend
+            zstart += deltaz
+            zend += deltazend
+            y += 1
 
 
 
@@ -78,30 +122,9 @@ def draw_polygons( matrix, screen, zbuffer, color ):
     while point < len(matrix) - 2:
 
         normal = calculate_normal(matrix, point)[:]
-        
+
         if normal[2] > 0:
-            
-            draw_line( int(matrix[point][0]),
-                       int(matrix[point][1]),
-                       matrix[point][2],
-                       int(matrix[point+1][0]),
-                       int(matrix[point+1][1]),
-                       matrix[point+1][2],
-                       screen, zbuffer, color)
-            draw_line( int(matrix[point+2][0]),
-                       int(matrix[point+2][1]),
-                       matrix[point+2][2],
-                       int(matrix[point+1][0]),
-                       int(matrix[point+1][1]),
-                       matrix[point+1][2],
-                       screen, zbuffer, color)
-            draw_line( int(matrix[point][0]),
-                       int(matrix[point][1]),
-                       matrix[point][2],
-                       int(matrix[point+2][0]),
-                       int(matrix[point+2][1]),
-                       matrix[point+2][2],
-                       screen, zbuffer, color)
+            scanline_convert(matrix, point, screen, zbuffer)
         point+= 3
 
 
