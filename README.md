@@ -1,2 +1,2 @@
 # solids
-Scan line convert and z buffering for graphics + color!
+Graphics assignment- Scan line convert and z buffering for graphics + color!
